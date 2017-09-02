@@ -15,8 +15,8 @@ import org.junit.runner.RunWith;
 import org.xtext.example.mydsl.myDsl.Model;
 import org.xtext.example.mydsl.tests.MyDslInjectorProvider;
 
-@RunWith(XtextRunner.class)
-@InjectWith(MyDslInjectorProvider.class)
+@RunWith(XtextRunner.class)/* 
+@InjectWith(MyDslInjectorProvider.class) */
 @SuppressWarnings("all")
 public class MyDslParsingTest {
   @Inject

@@ -8,10 +8,8 @@ Model:
 
 (operations += Operation)*;
 
-terminal ATTR : ID ('.' ID)+;
-
 Operation:
-'operation' left=[ecore::EClass|ATTR] 'and' right=[ecore::EClass|ATTR] 'defined' 'as' condition=XExpression
+'operation' left=[ecore::EClass|QualifiedName] 'and' right=[ecore::EClass|QualifiedName] 'defined' 'as' condition=XExpression
 ;
 
 	

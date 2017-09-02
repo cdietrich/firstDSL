@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="imdb" nsURI="http://mdsd.sdq.ipd.kit.edu/mj#imdb" nsPrefix="edu.kit.ipd.sdq.mdsd.mj">
+  <eClassifiers xsi:type="ecore:EClass" name="Person" abstract="true">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="dob" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDate"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="IMDB">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="films" upperBound="-1"
+        eType="#//Film" containment="true" eOpposite="#//Film/library"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="actors" upperBound="-1"
+        eType="#//Actor" containment="true" eOpposite="#//Actor/library"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="users" upperBound="-1"
+        eType="#//User" containment="true" eOpposite="#//User/library"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="votes" upperBound="-1"
+        eType="#//Vote" containment="true" eOpposite="#//Vote/library"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Film">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="figures" lowerBound="1"
+        upperBound="-1" eType="#//Figure" containment="true" eOpposite="#//Figure/film"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="title" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="titletwo" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="year" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="library" eType="#//IMDB"
+        eOpposite="#//IMDB/films"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="votes" upperBound="-1"
+        eType="#//Vote" eOpposite="#//Vote/film"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Figure">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="film" eType="#//Film" eOpposite="#//Film/figures"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="playedBy" lowerBound="1"
+        upperBound="-1" eType="#//Actor" eOpposite="#//Actor/plays"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Vote">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="library" lowerBound="1"
+        eType="#//IMDB" eOpposite="#//IMDB/votes"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="score" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="film" lowerBound="1" eType="#//Film"
+        eOpposite="#//Film/votes"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="user" lowerBound="1" eType="#//User"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="User" eSuperTypes="#//Person">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="userName" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="email" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="library" lowerBound="1"
+        eType="#//IMDB" eOpposite="#//IMDB/users"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Actor" eSuperTypes="#//Person">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="library" eType="#//IMDB"
+        eOpposite="#//IMDB/actors"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="plays" upperBound="-1"
+        eType="#//Figure" eOpposite="#//Figure/playedBy"/>
+  </eClassifiers>
+</ecore:EPackage>

@@ -4,6 +4,12 @@
 package org.xtext.example.mydsl.jvmmodel
 
 import com.google.inject.Inject
+import org.eclipse.emf.codegen.ecore.genmodel.GenClass
+import org.eclipse.emf.codegen.ecore.genmodel.GenModel
+import org.eclipse.emf.ecore.EClass
+import org.eclipse.emf.ecore.plugin.EcorePlugin
+import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl
+import org.eclipse.xtext.common.types.JvmDeclaredType
 import org.eclipse.xtext.xbase.jvmmodel.AbstractModelInferrer
 import org.eclipse.xtext.xbase.jvmmodel.IJvmDeclaredTypeAcceptor
 import org.eclipse.xtext.xbase.jvmmodel.JvmTypesBuilder
@@ -28,11 +34,11 @@ class MyDslJvmModelInferrer extends AbstractModelInferrer {
 	 * 
 	 * @param element
 	 *            the model to create one or more
-	 *            {@link org.eclipse.xtext.common.types.JvmDeclaredType declared
+	 *            {@link JvmDeclaredType declared
 	 *            types} from.
 	 * @param acceptor
 	 *            each created
-	 *            {@link org.eclipse.xtext.common.types.JvmDeclaredType type}
+	 *            {@link JvmDeclaredType type}
 	 *            without a container should be passed to the acceptor in order
 	 *            get attached to the current resource. The acceptor's
 	 *            {@link IJvmDeclaredTypeAcceptor#accept(org.eclipse.xtext.common.types.JvmDeclaredType)
@@ -49,14 +55,33 @@ class MyDslJvmModelInferrer extends AbstractModelInferrer {
 		// Here you explain how your model is mapped to Java elements, by writing the actual translation code.
 		
 		// An implementation for the initial hello world example could look like this:
-// 		acceptor.accept(element.toClass("my.company.greeting.MyGreetings")) [
-// 			for (greeting : element.greetings) {
-// 				members += greeting.toMethod("hello" + greeting.name, typeRef(String)) [
-// 					body = '''
-//						return "Hello «greeting.name»";
-//					'''
-//				]
-//			}
-//		]
+		//TODO better infered classes
+		acceptor.accept(element.toClass("sample.Sample")) [
+			var r = 0
+			for (op : element.operations) {
+				members += op.toField(op.left.name, op.left.javaClass.typeRef)
+				members += op.toField(op.right.name, op.right.javaClass.typeRef)
+				members += op.toMethod("op"+r, Boolean.TYPE.typeRef) [
+					body=op.condition
+				]
+				r++
+			}
+		]
+	}
+	
+	def String getJavaClass(EClass eclazz) {
+    val uri = EcorePlugin.getEPackageNsURIToGenModelLocationMap(true).get(eclazz.EPackage.nsURI)
+    val rs = new ResourceSetImpl
+    val r = rs.getResource(uri, true)
+    r.load(null)
+    val p = r.contents.head
+    if (p instanceof GenModel) {
+        val genClass = p.findGenClassifier(eclazz)
+        if (genClass instanceof GenClass) {
+            println(genClass.qualifiedInterfaceName)
+            return genClass.qualifiedInterfaceName
+        }
+    }
+    return  null
 	}
 }

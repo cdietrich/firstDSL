@@ -5,12 +5,31 @@ package org.xtext.example.mydsl.jvmmodel;
 
 import com.google.inject.Inject;
 import java.util.Arrays;
+import org.eclipse.emf.codegen.ecore.genmodel.GenClass;
+import org.eclipse.emf.codegen.ecore.genmodel.GenClassifier;
+import org.eclipse.emf.codegen.ecore.genmodel.GenModel;
+import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.common.util.URI;
+import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.plugin.EcorePlugin;
+import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
+import org.eclipse.xtext.common.types.JvmDeclaredType;
+import org.eclipse.xtext.common.types.JvmField;
+import org.eclipse.xtext.common.types.JvmGenericType;
+import org.eclipse.xtext.common.types.JvmMember;
+import org.eclipse.xtext.common.types.JvmOperation;
 import org.eclipse.xtext.xbase.jvmmodel.AbstractModelInferrer;
 import org.eclipse.xtext.xbase.jvmmodel.IJvmDeclaredTypeAcceptor;
 import org.eclipse.xtext.xbase.jvmmodel.JvmTypesBuilder;
+import org.eclipse.xtext.xbase.lib.Exceptions;
 import org.eclipse.xtext.xbase.lib.Extension;
+import org.eclipse.xtext.xbase.lib.InputOutput;
+import org.eclipse.xtext.xbase.lib.IterableExtensions;
+import org.eclipse.xtext.xbase.lib.Procedures.Procedure1;
 import org.xtext.example.mydsl.myDsl.Model;
+import org.xtext.example.mydsl.myDsl.Operation;
 
 /**
  * <p>Infers a JVM model from the source model.</p>
@@ -33,11 +52,11 @@ public class MyDslJvmModelInferrer extends AbstractModelInferrer {
    * 
    * @param element
    *            the model to create one or more
-   *            {@link org.eclipse.xtext.common.types.JvmDeclaredType declared
+   *            {@link JvmDeclaredType declared
    *            types} from.
    * @param acceptor
    *            each created
-   *            {@link org.eclipse.xtext.common.types.JvmDeclaredType type}
+   *            {@link JvmDeclaredType type}
    *            without a container should be passed to the acceptor in order
    *            get attached to the current resource. The acceptor's
    *            {@link IJvmDeclaredTypeAcceptor#accept(org.eclipse.xtext.common.types.JvmDeclaredType)
@@ -51,6 +70,48 @@ public class MyDslJvmModelInferrer extends AbstractModelInferrer {
    *            <code>true</code>.
    */
   protected void _infer(final Model element, final IJvmDeclaredTypeAcceptor acceptor, final boolean isPreIndexingPhase) {
+    final Procedure1<JvmGenericType> _function = (JvmGenericType it) -> {
+      int r = 0;
+      EList<Operation> _operations = element.getOperations();
+      for (final Operation op : _operations) {
+        {
+          EList<JvmMember> _members = it.getMembers();
+          JvmField _field = this._jvmTypesBuilder.toField(op, op.getLeft().getName(), this._typeReferenceBuilder.typeRef(this.getJavaClass(op.getLeft())));
+          this._jvmTypesBuilder.<JvmField>operator_add(_members, _field);
+          EList<JvmMember> _members_1 = it.getMembers();
+          JvmField _field_1 = this._jvmTypesBuilder.toField(op, op.getRight().getName(), this._typeReferenceBuilder.typeRef(this.getJavaClass(op.getRight())));
+          this._jvmTypesBuilder.<JvmField>operator_add(_members_1, _field_1);
+          EList<JvmMember> _members_2 = it.getMembers();
+          final Procedure1<JvmOperation> _function_1 = (JvmOperation it_1) -> {
+            this._jvmTypesBuilder.setBody(it_1, op.getCondition());
+          };
+          JvmOperation _method = this._jvmTypesBuilder.toMethod(op, ("op" + Integer.valueOf(r)), this._typeReferenceBuilder.typeRef(Boolean.TYPE), _function_1);
+          this._jvmTypesBuilder.<JvmOperation>operator_add(_members_2, _method);
+          r++;
+        }
+      }
+    };
+    acceptor.<JvmGenericType>accept(this._jvmTypesBuilder.toClass(element, "sample.Sample"), _function);
+  }
+  
+  public String getJavaClass(final EClass eclazz) {
+    try {
+      final URI uri = EcorePlugin.getEPackageNsURIToGenModelLocationMap(true).get(eclazz.getEPackage().getNsURI());
+      final ResourceSetImpl rs = new ResourceSetImpl();
+      final Resource r = rs.getResource(uri, true);
+      r.load(null);
+      final EObject p = IterableExtensions.<EObject>head(r.getContents());
+      if ((p instanceof GenModel)) {
+        final GenClassifier genClass = ((GenModel)p).findGenClassifier(eclazz);
+        if ((genClass instanceof GenClass)) {
+          InputOutput.<String>println(((GenClass)genClass).getQualifiedInterfaceName());
+          return ((GenClass)genClass).getQualifiedInterfaceName();
+        }
+      }
+      return null;
+    } catch (Throwable _e) {
+      throw Exceptions.sneakyThrow(_e);
+    }
   }
   
   public void infer(final EObject element, final IJvmDeclaredTypeAcceptor acceptor, final boolean isPreIndexingPhase) {

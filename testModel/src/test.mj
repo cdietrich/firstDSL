@@ -1,2 +1,2 @@
 operation imdb.Actor and imdb.Film defined as 
-Actor.plays.size > 1
+Actor.plays.size > 1 && Film.title == "Godzilla"
